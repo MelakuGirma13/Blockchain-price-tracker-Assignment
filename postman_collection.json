@@ -1,0 +1,94 @@
+{
+	"info": {
+		"_postman_id": "5dee6626-9e80-4318-b2a4-82b689ecbb7a",
+		"name": "blockChainTracker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26871351"
+	},
+	"item": [
+		{
+			"name": "getPriceOfEachHour",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/token/getPriceOfEachHour",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"token",
+						"getPriceOfEachHour"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "setAlert",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/alert/setAlert/?chain=WMATIC&dollar=0.480141209485355000&email=melaku.girma.fr@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"alert",
+						"setAlert",
+						""
+					],
+					"query": [
+						{
+							"key": "chain",
+							"value": "WMATIC"
+						},
+						{
+							"key": "dollar",
+							"value": "0.480141209485355000"
+						},
+						{
+							"key": "email",
+							"value": "melaku.girma.fr@gmail.com"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create-user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"hyperhire_assignment@hyperhire.in\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/user/createUser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"createUser"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

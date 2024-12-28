@@ -1,0 +1,10 @@
+.https://hyperhire.notion.site/Blockchain-Node-js-52e737665c7a42cabf6e8c38ad868d26
+.https://hyperhire.notion.site/MiMeCon-Project-Guide-e18aa1ccde5944d49673d63df1216be9
+
+.migration
+    npm run start //start app
+    npm run db:drop   //drop tables, script is written in package.json
+    npm run db:create src/migrations/createTag  //generate migration, 'users' is migration name and .src/migration  is directory path where migration file will saveed
+    npm run db:migrate
+
+ 
