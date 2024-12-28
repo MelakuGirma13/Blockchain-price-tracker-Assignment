@@ -1,12 +1,6 @@
 import {
-  BeforeApplicationShutdown,
-  forwardRef,
-  Inject,
   Injectable,
   Logger,
-  OnApplicationShutdown,
-  OnModuleDestroy,
-  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TokenEntity, TokenPriceHistory } from './token.entity';
@@ -16,8 +10,6 @@ import { NotificationDto } from '@app/email/email.dto';
 import { EmailService } from '@app/email/email.service';
 import axios from 'axios';
 import * as https from 'https';
-import { TokenInfo } from './types';
-import { response } from 'express';
 
 @Injectable()
 export class TokenService {
@@ -81,7 +73,7 @@ export class TokenService {
     }
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async handleCron() {
     const tokenResponse = await this.featchData();
     if (tokenResponse && tokenResponse.length > 0) {
@@ -188,7 +180,7 @@ export class TokenService {
         ((currentPrice - historicalPrice) / historicalPrice) * 100;
 
       // email if the price increase exceeds 3%
-      if (priceIncreasePercentage > 0.000001) {
+      if (priceIncreasePercentage > 3) {
         console.log(
           `Price increased by ${priceIncreasePercentage.toFixed(2)}% for token ${tokenEntity.tokenName} (${tokenEntity.tokenSymbol})`,
         );
