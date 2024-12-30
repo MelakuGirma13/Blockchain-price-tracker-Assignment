@@ -16,8 +16,11 @@ export class UserService {
     });
   }
 
+  async createUser(body: any): Promise<UserEntity> {
+    return await this.userRipo.save({ email: body.email });
+  }
 
-  async createUser(body: any):Promise<UserEntity>{
-    return await this.userRipo.save({email:body.email});
+  async getAllUsers(): Promise<UserEntity[]> {
+    return await this.userRipo.find();
   }
 }

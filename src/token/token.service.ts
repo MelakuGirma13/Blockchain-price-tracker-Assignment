@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TokenEntity, TokenPriceHistory } from './token.entity';
 import { DataSource, LessThan, Repository } from 'typeorm';
@@ -10,12 +7,15 @@ import { NotificationDto } from '@app/email/email.dto';
 import { EmailService } from '@app/email/email.service';
 import axios from 'axios';
 import * as https from 'https';
+import { UserService } from '@app/user/user.service';
+import { UserEntity } from '@app/user/user.entity';
 
 @Injectable()
 export class TokenService {
   private readonly logger = new Logger(TokenService.name);
   constructor(
     private readonly emailService: EmailService,
+    private readonly userService: UserService,
     private readonly connection: DataSource,
 
     @InjectRepository(TokenEntity)
@@ -207,31 +207,37 @@ export class TokenService {
     tokenSymbol: string,
   ) {
     try {
-      const email: NotificationDto = {
-        to: 'melaku.girma.fr@gmail.com',
-        subject: `${token} ${tokenSymbol} price has risen by 3%`,
-        text: `
-        Hello,
-        
-        We have an exciting update! The price of ${token} (${tokenSymbol}) has increased by 3% in the past hour and is now ${newPrice}.
-        
-        Details:
-        - Token: ${token} (${tokenSymbol})
-        - Price: ${newPrice}
-        - Change: +3% (in the last 1 hour)
-        
-        Additional Information:
-        - Assignment completed by: melaku.girma.fr@gmail.com
-        -Assignment URL: https://hyperhire.notion.site/Blockchain-Node-js-52e737665c7a42cabf6e8c38ad868d26
-        - Status: Actively looking for job opportunities (Open to work)
-        - GitHub Repository: [Blockchain Price Tracker Assignment](https://github.com/MelakuGirma13/Blockchain-price-tracker-Assignment)
-        
-        Best regards,  
-        Melaku.G
-        `,
-      };
-      await this.emailService.notifyEmail(email);
-      console.log('notifyPriceIncrease email done.');
+      const users = await this.userService.getAllUsers();
+      for (const user of users) {
+        const email: NotificationDto = {
+          to: user.email,
+          subject: `${token} ${tokenSymbol} price has risen by 3%`,
+          text: `
+         Hello ${user.email || ''}, 
+          
+          We have an exciting update! The price of ${token} (${tokenSymbol}) has increased by 3% in the past hour and is now ${newPrice}.
+          
+          Details:
+          - Token: ${token} (${tokenSymbol})
+          - Price: ${newPrice}
+          - Change: +3% (in the last 1 hour)
+          
+          Additional Information:
+          - Assignment completed by: melaku.girma.fr@gmail.com
+          -Assignment URL: https://hyperhire.notion.site/Blockchain-Node-js-52e737665c7a42cabf6e8c38ad868d26
+          - Status: Actively looking for job opportunities (Open to work)
+          - GitHub Repository: [Blockchain Price Tracker Assignment](https://github.com/MelakuGirma13/Blockchain-price-tracker-Assignment)
+          
+          Best regards,  
+          Melaku.G
+          `,
+        };
+
+        await this.emailService.notifyEmail(email);
+        console.log(`Email sent to ${user.email}.`);
+      }
+
+      console.log('All notification emails sent.');
     } catch (error) {
       this.logger.error(
         `Failed to send email: ${token}, ${tokenSymbol}`,
@@ -264,15 +270,15 @@ export class TokenService {
         'token.tokenName',
         'token.tokenSymbol',
         'AVG(history.usdPrice) as avgPrice',
-        "DATE_TRUNC('hour', history.timestamp) as hour", 
+        "DATE_TRUNC('hour', history.timestamp) as hour",
       ])
-      .where('history.timestamp >= :past24Hours', { past24Hours: past24Hours.toISOString() })
+      .where('history.timestamp >= :past24Hours', {
+        past24Hours: past24Hours.toISOString(),
+      })
       .groupBy('token.id, hour') // Group by token and truncated hour
-      .orderBy('hour', 'ASC') 
+      .orderBy('hour', 'ASC')
       .getRawMany();
 
     return tokenEntities2;
-}
-
-
+  }
 }
